@@ -1,0 +1,34 @@
+# ============================================================
+# zensical.toml (Zensical configuration file)
+# ============================================================
+# WHY: Centralizes project documentation configuration.
+
+[project]
+site_name = "adaptive-manifest-schema"
+site_url = "https://adaptive-interfaces.github.io/adaptive-manifest-schema/"
+repo_url = "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
+repo_name = "adaptive-interfaces/adaptive-manifest-schema"
+site_description = "Canonical MANIFEST.toml schema and validator for the Adaptive Interfaces ecosystem"
+docs_dir = "docs"
+site_dir = "site"
+edit_uri = "edit/main/docs/"
+
+[project.extra]
+social = [
+    {icon = "fontawesome/brands/github", link = "https://github.com/adaptive-interfaces/adaptive-manifest-schema"},
+]
+
+[project.plugins.search]
+lang = "en"
+
+[project.theme]
+features = [
+    "navigation.tracking",
+    "navigation.expand",
+    "navigation.path",
+    "navigation.prune",
+    "navigation.indexes",
+    "toc.follow",
+    "toc.integrate",
+    "navigation.top",
+]

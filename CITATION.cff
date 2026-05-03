@@ -1,0 +1,46 @@
+# ============================================================
+# CITATION.cff (How to cite this project)
+# ============================================================
+
+cff-version: "1.2.0"
+type: software
+
+title: "adaptive-manifest-schema: Canonical MANIFEST.toml Schema for Adaptive Interfaces"
+version: 0.1.0
+date-released: 2026-05-03
+
+authors:
+  - family-names: Case
+    given-names: Denise M.
+    orcid: "https://orcid.org/0000-0001-6165-7389"
+    affiliation: >-
+      Northwest Missouri State University,
+      School of Computer Science and Information Systems,
+      Maryville, MO, USA
+
+repository-code: "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
+url: "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
+license: MIT
+
+abstract: >
+  Canonical schema definition and validation CLI for MANIFEST.toml files
+  across all Adaptive Interfaces repositories.
+  Provides field definitions, cross-field invariants, and a validator CLI
+  (adaptive-manifest validate) for ensuring manifest correctness.
+  Foundation layer of the Adaptive Interfaces ecosystem;
+  no upstream adaptive-interfaces dependencies.
+
+keywords:
+  - adaptive-interfaces
+  - manifest
+  - schema
+  - validation
+  - toml
+  - python
+  - uv
+  - ruff
+  - pyright
+  - hatchling
+  - zensical
+
+message: "If you use this work, please cite it using the metadata in this file."

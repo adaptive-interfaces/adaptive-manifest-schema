@@ -1,0 +1,144 @@
+# ============================================================
+# pyproject.toml (Python project configuration)
+# ============================================================
+# Updated: 2026-05-03
+# REQ.PYTHON: Python projects MUST include pyproject.toml as the single source of truth.
+# WHY: Centralizes project configuration.
+# CUSTOM: Update identity and build tool src folders.
+
+# ============================================================
+# SECTION 1: PROJECT IDENTITY (name, version, CUSTOM dependencies)
+# ============================================================
+
+[project]
+name = "adaptive-manifest-schema"
+readme = "README.md"
+requires-python = ">=3.15"
+dynamic = ["version"]
+description = "Canonical MANIFEST.toml schema and validation for the Adaptive Interfaces ecosystem."
+license = { file = "LICENSE" }
+authors = [
+    { name = "Adaptive Interfaces", email = "adaptive-interfaces@github.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.15",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
+keywords = [
+    "adaptive-interfaces",
+    "manifest",
+    "schema",
+    "validation",
+    "toml",
+]
+dependencies = [
+    "PyYAML",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "packaging",
+    "pre-commit",
+    "pyright",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "twine",
+]
+
+docs = [
+    "zensical==0.0.37",
+]
+
+[project.scripts]
+adaptive-manifest = "adaptive_manifest_schema.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
+Repository = "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
+Documentation = "https://adaptive-interfaces.github.io/adaptive-manifest-schema/"
+
+# ============================================================
+# SECTION 2: TOOL CONFIGURATION
+# ============================================================
+
+[tool.pyright]
+include = ["src", "tests"]
+extraPaths = ["src", "tests"]
+exclude = ["**/node_modules", "**/.*", ".venv", "**/__pycache__", "dist", "build"]
+pythonVersion = "3.15"
+reportMissingTypeStubs = "none"
+reportMissingImports = "warning"
+reportPrivateUsage = "none"
+typeCheckingMode = "strict"
+
+[[tool.pyright.executionEnvironments]]
+root = "tests"
+typeCheckingMode = "basic"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "--cov=adaptive_manifest_schema --cov-report=term-missing --cov-fail-under=75"
+
+[tool.ruff]
+exclude = [
+    ".eggs", "*.egg-info", ".ruff_cache", ".venv",
+    "__pycache__", "build", "dist", "site",
+]
+line-length = 88
+preview = false
+target-version = "py313"
+unsafe-fixes = false
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+quote-style = "preserve"
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", "I", "UP", "B",
+    "PTH", "C4", "SIM", "RET",
+    "D", "S",
+]
+ignore = ["E501", "D203", "D213", "S101"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+
+[tool.ruff.lint.per-file-ignores]
+"src/**/__init__.py" = ["F401"]
+"src/**/_version.py" = ["ALL"]
+"tests/**/*.py" = ["D", "B018", "B011", "S101"]
+"src/**/py.typed" = ["ALL"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# ============================================================
+# SECTION 3: BUILD SYSTEM
+# ============================================================
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs"]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/adaptive_manifest_schema/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/adaptive_manifest_schema"]
+force-include = {"schema/manifest-1.toml" = "adaptive_manifest_schema/manifest-1.toml"}
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.1.0"
+tag-pattern = "^(?:v)?(?P<version>\\d+\\.\\d+\\.\\d+)$"

@@ -1,0 +1,9 @@
+# ============================================================
+# schema/manifest-1.toml
+# ============================================================
+# Canonical adaptive-interfaces-manifest-1 schema definition.
+# Stub: full schema definition implemented in commit 4.
+
+[schema]
+version = "adaptive-interfaces-manifest-1"
+description = "Schema for MANIFEST.toml files in the Adaptive Interfaces ecosystem."
