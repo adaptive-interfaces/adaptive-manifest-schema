@@ -63,6 +63,19 @@ Read [`SKILL.md`](SKILL.md) before generating any artifact that consumes this AP
 Read [`DECISIONS.md`](DECISIONS.md) for design rationale.
 Read [`AGENTS.md`](AGENTS.md) for workflow requirements.
 
+## Scaffold Process
+
+See SCAFFOLD.md.
+
+Prompt for Commit 4:
+
+```text
+Use the SE schema example to build out the project specific logic
+needed for this one.
+Include our new fields.
+Implement it just like we did the SE manifest schema.
+```
+
 ## License
 
 MIT © 2026 [Adaptive Interfaces](https://github.com/adaptive-interfaces)

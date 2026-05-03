@@ -2,8 +2,220 @@
 # schema/manifest-1.toml
 # ============================================================
 # Canonical adaptive-interfaces-manifest-1 schema definition.
-# Stub: full schema definition implemented in commit 4.
+# Defines required sections, fields, and validation rules for
+# MANIFEST.toml files in the Adaptive Interfaces ecosystem.
+# ============================================================
 
-[schema]
-version = "adaptive-interfaces-manifest-1"
-description = "Schema for MANIFEST.toml files in the Adaptive Interfaces ecosystem."
+[meta]
+schema = "adaptive-interfaces-manifest-schema-1"
+version = "0.1.0"
+status = "active"
+title = "Adaptive Interfaces Manifest Schema"
+manifest_schema_id = "adaptive-interfaces-manifest-1"
+purpose = "Defines required sections, fields, and validation rules for MANIFEST.toml across all adaptive-interfaces repos."
+
+[manifest]
+filename = "MANIFEST.toml"
+human_legible = true
+machine_readable = true
+reviewable = true
+
+[manifest.identity]
+schema_field = "schema"
+schema_required = true
+schema_allowed = ["adaptive-interfaces-manifest-1"]
+
+schema_url_field = "schema_url"
+schema_url_required = true
+
+# Section registry
+
+[section.meta]
+required = true
+description = "Non-normative contextual information about the repo."
+allowed_fields = ["purpose"]
+
+[section.repo]
+required = true
+description = "Stable repository identity and declared class."
+allowed_fields = [
+    "name", "org", "class", "kind",
+    "status", "since", "visibility", "summary",
+]
+
+[section.layer]
+required = true
+description = "Declared position in the ecosystem layer model."
+allowed_fields = ["space", "role"]
+
+[section.depends]
+required = true
+description = "Declared upstream dependencies."
+allowed_fields = ["required", "optional"]
+
+[section.provides]
+required = true
+description = "Artifacts intentionally provided and maintained."
+allowed_fields = ["artifacts"]
+
+[section.scope]
+required = true
+description = "Explicit scope declaration."
+allowed_fields = ["includes", "excludes"]
+
+[section.citation]
+required = true
+description = "Citation metadata pointer."
+allowed_fields = ["cff", "preferred"]
+
+[section.package]
+required = false
+description = "Python package identity and CLI configuration."
+allowed_fields = ["python_name", "cli", "cli_entry", "cli_description"]
+
+[section.docs]
+required = false
+description = "Documentation tooling configuration."
+allowed_fields = ["enabled", "tool", "deploy"]
+
+[section.ci]
+required = false
+description = "CI workflow configuration."
+allowed_fields = ["link_check", "dependabot", "actionlint"]
+
+[section.release]
+required = false
+description = "Release procedure configuration."
+allowed_fields = ["validate_step", "changelog_sections"]
+
+[section.agent]
+required = false
+description = "Agent behavioral directives."
+allowed_fields = ["conformance", "skill"]
+
+[section.conventions]
+required = false
+description = "Conventions source for ACS scaffold conformance."
+allowed_fields = ["source"]
+
+# Field definitions
+
+[field.meta]
+purpose = {type = "string", required = true}
+
+[field.repo]
+name = {type = "string", required = true}
+org = {type = "string", required = true}
+class = {type = "string", required = true}
+kind = {type = "string", required = true}
+status = {type = "string", required = true}
+since = {type = "string", required = true}
+visibility = {type = "string", required = false}
+summary = {type = "string", required = false}
+
+[field.layer]
+space = {type = "string", required = true}
+role = {type = "string", required = true}
+
+[field.depends]
+required = {type = "list[string]", required = true}
+optional = {type = "list[string]", required = true}
+
+[field.provides]
+artifacts = {type = "list[string]", required = true}
+
+[field.scope]
+includes = {type = "list[string]", required = true}
+excludes = {type = "list[string]", required = true}
+
+[field.citation]
+cff = {type = "string", required = true}
+preferred = {type = "string", required = true}
+
+[field.package]
+python_name = {type = "string", required = true}
+cli = {type = "boolean", required = false}
+cli_entry = {type = "string", required = false}
+cli_description = {type = "string", required = false}
+
+[field.docs]
+enabled = {type = "boolean", required = true}
+tool = {type = "string", required = false}
+deploy = {type = "boolean", required = false}
+
+[field.ci]
+link_check = {type = "boolean", required = false}
+dependabot = {type = "boolean", required = false}
+actionlint = {type = "boolean", required = false}
+
+[field.release]
+validate_step = {type = "string", required = false}
+changelog_sections = {type = "list[string]", required = false}
+
+[field.agent]
+conformance = {type = "string", required = false}
+skill = {type = "string", required = false}
+
+[field.conventions]
+source = {type = "string", required = true}
+
+# Class registry
+
+[class.library]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["package", "docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+[class.simulation]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["package", "docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+[class.schema]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["package", "docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+[class.guide]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+[class.example]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["package", "docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+[class.skill]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+[class.lab]
+required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
+optional_sections = ["package", "docs", "ci", "release", "agent", "conventions"]
+forbidden_sections = []
+
+# Validation rules
+
+[validation]
+require_known_sections_only = false
+require_known_fields_only = false
+require_single_repo_class = true
+require_repo_name_to_match_declared_class = false
+require_declared_class_to_exist_in_class_registry = true
+require_manifest_filename_exact = true
+
+[validation.defaults]
+empty_optional_lists_allowed = true
+empty_required_lists_allowed = true
+
+[notes]
+manifest_role = "Declares repository identity, scope, role, and tooling configuration."
+non_goals = [
+    "build configuration",
+    "deployment configuration",
+    "runtime secrets",
+    "replace README documentation",
+    "replace CITATION.cff",
+]
