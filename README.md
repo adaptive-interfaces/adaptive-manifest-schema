@@ -4,6 +4,8 @@
 
 Part of the [Adaptive Interfaces](https://github.com/adaptive-interfaces) ecosystem.
 
+<mark>**STATUS: Scaffolded with just a few foundation files, then two agent files, and two prompts.**</mark>
+
 ## Introduction
 
 Every Adaptive Interfaces repository includes a `MANIFEST.toml` that declares
