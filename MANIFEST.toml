@@ -1,0 +1,130 @@
+# ============================================================
+# MANIFEST.toml (Repository Declaration)
+# adaptive-manifest-schema
+# ============================================================
+
+schema = "adaptive-interfaces-manifest-1"
+schema_url = "https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/schema/manifest-1.md"
+# NOTE: This repo defines the schema. It bootstraps by declaring itself
+# under manifest-1 until manifest-2 is published here.
+# See DECISIONS.md D-003.
+
+# === Identity ===
+
+[meta]
+purpose = "Canonical MANIFEST.toml schema and validator for the Adaptive Interfaces ecosystem."
+
+[repo]
+name = "adaptive-manifest-schema"
+org = "adaptive-interfaces"
+class = "schema"
+kind = "library"
+status = "active"
+since = "2026"
+visibility = "public"
+summary = "Schema definition and validation CLI for MANIFEST.toml files across all adaptive-interfaces repos."
+
+[layer]
+space = "foundation"
+role = "schema-and-validator"
+
+# === Dependencies ===
+
+[depends]
+required = []
+optional = []
+# WHY: No upstream adaptive-interfaces dependencies.
+# This repo is the foundation layer; all others depend on it.
+# See DECISIONS.md D-005.
+
+# === Provided artifacts ===
+
+[provides]
+artifacts = [
+  "MANIFEST.toml schema definition (manifest-1)",
+  "MANIFEST.toml schema definition (manifest-2, proposed fields)",
+  "adaptive-manifest CLI (validate subcommand)",
+  "Python library for reading and validating MANIFEST.toml files",
+]
+
+# === Scope ===
+
+[scope]
+includes = [
+  "canonical MANIFEST.toml schema field definitions and invariants",
+  "cross-field validation rules",
+  "CLI validator (adaptive-manifest validate)",
+  "Python library for programmatic manifest reading and validation",
+]
+
+excludes = [
+  "repo scaffolding or generation tools",
+  "convention file management",
+  "CI workflow templates",
+  "schemas specific to other organizations",
+]
+
+# === Package (proposed: adaptive-interfaces-manifest-2) ===
+
+[package]
+python_name = "adaptive_manifest_schema"
+# WHY: Drives src/ layout, --cov= pytest target, hatch packages, _version.py path.
+cli = true
+cli_entry = "adaptive_manifest_schema.cli:main"
+cli_description = "Validate MANIFEST.toml files against the adaptive-interfaces schema"
+# WHY: cli=true drives [project.scripts] in pyproject.toml and scaffolds
+# cli.py, __init__.py, and __main__.py boilerplate.
+
+# === Docs (proposed: adaptive-interfaces-manifest-2) ===
+
+[docs]
+enabled = true
+tool = "zensical"
+deploy = true
+# WHY: enabled=true drives zensical.toml, docs build step in CI.
+# deploy=true drives deploy-zensical.yml workflow for GitHub Pages.
+
+# === CI (proposed: adaptive-interfaces-manifest-2) ===
+
+[ci]
+link_check = true
+dependabot = true
+actionlint = false
+# WHY: link_check=true drives links.yml workflow.
+# dependabot=true drives dependabot.yml (GitHub Actions updates only).
+# actionlint=false - org-level only, not per-repo.
+
+# === Release (proposed: adaptive-interfaces-manifest-2) ===
+
+[release]
+validate_step = "uv run adaptive-manifest validate"
+# WHY: Validates the repo's own MANIFEST.toml as the release integrity check.
+# Convention steps (pre-commit, pyright, pytest) are always run; this is what is extra.
+changelog_sections = [
+  "Notes on versioning and releases",
+  "Release Procedure",
+  "Links",
+]
+
+# === Agent (proposed: adaptive-interfaces-manifest-2) ===
+
+[agent]
+conformance = "https://github.com/adaptive-interfaces/adaptive-conformance-specification"
+# WHY: Agents working in this repo MUST apply ACS observe-infer-conform
+# before generating any artifact. Behavioral directive, not just a dependency.
+skill = "SKILL.md"
+# WHY: SKILL.md is the domain operating guide.
+# Authored after interface is stable (see DECISIONS.md D-003).
+
+# === Conventions (proposed: adaptive-interfaces-manifest-2) ===
+
+[conventions]
+source = "https://github.com/structural-explainability/se-manifest-schema"
+# WHY: se-manifest-schema is the closest analog; same architecture, mature pattern.
+# See DECISIONS.md D-002.
+
+# === Citation ===
+
+[citation]
+cff = "CITATION.cff"
+preferred = "CITATION.cff"
