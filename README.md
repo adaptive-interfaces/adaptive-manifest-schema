@@ -65,7 +65,7 @@ Read [`AGENTS.md`](AGENTS.md) for workflow requirements.
 
 ## Scaffold Process
 
-See SCAFFOLD.md.
+See [PLAYBOOK: scaffold-new-repo](https://github.com/adaptive-interfaces/adaptive-playbook/blob/main/patterns/scaffold-new-repo.md)
 
 Prompt for Commit 4:
 
