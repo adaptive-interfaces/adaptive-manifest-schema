@@ -35,7 +35,7 @@ def test_validate_missing_manifest_returns_1(tmp_path: Path) -> None:
 
 def test_validate_missing_schema_returns_1(tmp_path: Path) -> None:
     (tmp_path / "MANIFEST.toml").write_text(
-        'schema = "adaptive-interfaces-manifest-1"\n', encoding="utf-8"
+        'schema = "adaptive-interfaces-manifest-schema"\n', encoding="utf-8"
     )
     old = Path.cwd()
     os.chdir(tmp_path)

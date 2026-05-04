@@ -1,5 +1,6 @@
 # adaptive-manifest-schema
 
+[![Adaptive Interfaces](https://img.shields.io/badge/adaptive--interfaces-compliant-blue?logo=github)](https://github.com/adaptive-interfaces)
 [![PyPI](https://img.shields.io/pypi/v/adaptive-manifest-schema?logo=pypi&label=pypi)](https://pypi.org/project/adaptive-manifest-schema/)
 [![Docs Site](https://img.shields.io/badge/docs-site-blue?logo=github)](https://adaptive-interfaces.github.io/adaptive-manifest-schema/)
 [![Repo](https://img.shields.io/badge/repo-GitHub-black?logo=github)](https://github.com/adaptive-interfaces/adaptive-manifest-schema)
@@ -123,20 +124,35 @@ git push -u origin main
 
 ## Agent Usage
 
-Read [`SKILL.md`](https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/SKILL.md)
-before generating any artifact that consumes this API.
-Read [`DECISIONS.md`](https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/DECISIONS.md)
-for design rationale.
-Read [`AGENTS.md`](https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/AGENTS.md)
-for workflow requirements.
+This repository is structured for agent consumption.
+Read these files in order before generating any artifact:
+
+1. [`MANIFEST.toml`](./MANIFEST.toml) - repository contract and agent configuration
+2. [`SKILL.md`](./SKILL.md) - operating guide and interface contract
+3. [`DECISIONS.md`](./DECISIONS.md) - design rationale
+4. [`AGENTS.md`](./AGENTS.md) - workflow requirements
+5. [`AGENT_CONDUCT.md`](./AGENT_CONDUCT.md) - behavioral constraints
+
+## Working with Agents
+
+Agents may accumulate context drift over long sessions.
+Rereading may anchor them back to the repo's constraints.
+On long context windows, asking the agent to reread key documents may help.
+
+```text
+Please reread MANIFEST.toml, SKILL.md, and AGENTS.md
+before continuing.
+```
+
+## Documentation
+
+[Documentation Site](https://adaptive-interfaces.github.io/adaptive-manifest-schema/)
+
+## See also
+
+- [CHANGELOG.md](./CHANGELOG.md)
+- [CITATION.cff](./CITATION.cff)
 
 ## License
 
 MIT © 2026 [Adaptive Interfaces](https://github.com/adaptive-interfaces)
-
-## More
-
-- [CHANGELOG.md](./CHANGELOG.md)
-- [CITATION.cff](./CITATION.cff)
-- [DECISIONS.md](./DECISIONS.md)
-- [MANIFEST.toml](./MANIFEST.toml)

@@ -1,5 +1,7 @@
 # Scaffold Process (adaptive-manifest-schema)
 
+<!-- Design for durability; do not introduce drift -->
+
 How this repository was created and how to create a new repo using this schema.
 
 ## Reference

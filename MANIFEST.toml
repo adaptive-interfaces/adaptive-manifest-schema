@@ -3,13 +3,11 @@
 # adaptive-manifest-schema
 # ============================================================
 
-schema = "adaptive-interfaces-manifest-1"
-schema_url = "https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/schema/manifest-1.md"
-# NOTE: This repo defines the schema.
-# The schema_url points to the canonical source of truth for the schema,
-# which is versioned and documented in the repository itself.
-# This allows for clear reference and versioning of the schema as it evolves.
-# See DECISIONS.md D-003.
+schema = "adaptive-interfaces-manifest-schema"
+schema_url = "https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/manifest-schema.toml"
+# NOTE: Points to /main/ during development.
+# Will pin to a tag after v1.0.0 ships.
+# See DECISIONS.md D-003 and D-008.
 
 # === Identity ===
 
@@ -43,9 +41,8 @@ optional = []
 
 [provides]
 artifacts = [
-  "MANIFEST.toml schema definition (manifest-1)",
-  "MANIFEST.toml schema definition (manifest-2, proposed fields)",
-  "adaptive-manifest CLI (validate subcommand)",
+  "manifest-schema.toml - canonical schema definition",
+  "adaptive-manifest CLI (validate, validate-schema, sync-version)",
   "Python library for reading and validating MANIFEST.toml files",
 ]
 
@@ -110,26 +107,35 @@ changelog_sections = [
 # === Agent ===
 
 [agent]
-conformance = "https://github.com/adaptive-interfaces/adaptive-conformance-specification"
+
 # WHY: Agents working in this repo MUST apply ACS observe-infer-conform
 # before generating any artifact. Behavioral directive, not just a dependency.
-skill = "SKILL.md"
+conformance = "https://github.com/adaptive-interfaces/adaptive-conformance-specification"
+
 # WHY: SKILL.md is the domain operating guide.
 # Authored after interface is stable (see DECISIONS.md D-003).
-permissions = "read-generate"
+skill = "SKILL.md"
+
 # WHY: Agents read files and produce artifacts. No direct writes. See D-006.
+# Allowed: read-only, read-generate, read-write
+permissions = "read-generate"
+
+# WHY: All agent output reviewed by a human before applying. See D-006.
+# Allowed: human-review-required, automated
 checkpoint = "human-review-required"
-# WHY: All agent output reviewed before applying. See D-006.
+
+# WHY: Agent operates only within this repository. See D-006.
+# Allowed: this-repo-only, multi-repo
 scope = "this-repo-only"
-# WHY: Agent operates within this repository only. See D-006.
+
+# WHY: Agent stops and reports rather than guessing when scope is unclear.
 stop_on_ambiguity = true
-# WHY: Agent stops and reports rather than guessing. See D-006.
 
 # === Conventions ===
 
 [conventions]
 source = "https://github.com/structural-explainability/se-manifest-schema"
-# WHY: se-manifest-schema is the closest analog; same architecture, mature pattern.
+# WHY: closest analog; same architecture, mature pattern.
 # See DECISIONS.md D-002.
 
 # === Citation ===

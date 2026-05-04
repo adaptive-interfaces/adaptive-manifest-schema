@@ -1,7 +1,7 @@
 # ============================================================
-# schema/manifest-1.toml
+# manifest-schema.toml
 # ============================================================
-# Canonical adaptive-interfaces-manifest-1 schema definition.
+# Canonical adaptive-interfaces manifest schema definition.
 # Defines required sections, fields, and validation rules for
 # MANIFEST.toml files in the Adaptive Interfaces ecosystem.
 #
@@ -10,22 +10,6 @@
 #   [manifest]            manifest file contract
 #   [manifest.identity]   required top-level fields
 #
-#   SECTION REGISTRY      what sections are allowed and what they contain
-#     [section.meta]
-#     [section.repo]
-#     [section.layer]
-#     [section.depends]
-#     [section.provides]
-#     [section.scope]
-#     [section.citation]
-#     --- proposed: adaptive-interfaces-manifest-2 ---
-#     [section.package]
-#     [section.docs]
-#     [section.ci]
-#     [section.release]
-#     [section.agent]     <-- agent behavioral directives and safety constraints
-#     [section.conventions]
-#
 #   FIELD DEFINITIONS     types and required status per field
 #   CLASS REGISTRY        which sections each repo class requires
 #   VALIDATION RULES      enforcement policy
@@ -33,11 +17,11 @@
 # ============================================================
 
 [meta]
-schema = "adaptive-interfaces-manifest-schema-1"
+schema = "adaptive-interfaces-manifest-schema"
 version = "0.1.0"
 status = "active"
 title = "Adaptive Interfaces Manifest Schema"
-manifest_schema_id = "adaptive-interfaces-manifest-1"
+manifest_schema_id = "adaptive-interfaces-manifest-schema-1"
 purpose = "Defines required sections, fields, and validation rules for MANIFEST.toml across all adaptive-interfaces repos."
 
 [manifest]
@@ -49,7 +33,7 @@ reviewable = true
 [manifest.identity]
 schema_field = "schema"
 schema_required = true
-schema_allowed = ["adaptive-interfaces-manifest-1"]
+schema_allowed = ["adaptive-interfaces-manifest-schema"]
 
 schema_url_field = "schema_url"
 schema_url_required = true

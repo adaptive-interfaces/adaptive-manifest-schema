@@ -1,5 +1,7 @@
 # adaptive-manifest-schema
 
+<!-- Design for durability; do not introduce drift -->
+
 Canonical `MANIFEST.toml` schema and validator for the Adaptive Interfaces ecosystem.
 
 See the [repository](https://github.com/adaptive-interfaces/adaptive-manifest-schema)

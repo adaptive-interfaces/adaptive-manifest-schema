@@ -19,7 +19,7 @@ def _minimal_schema() -> ManifestSchemaData:
             "manifest": {
                 "identity": {
                     "schema_required": True,
-                    "schema_allowed": ["adaptive-interfaces-manifest-1"],
+                    "schema_allowed": ["adaptive-interfaces-manifest-schema"],
                     "schema_url_required": True,
                 }
             },
@@ -75,7 +75,7 @@ def _minimal_schema() -> ManifestSchemaData:
 
 def _minimal_manifest() -> dict[str, Any]:
     return {
-        "schema": "adaptive-interfaces-manifest-1",
+        "schema": "adaptive-interfaces-manifest-schema",
         "schema_url": "https://example.com",
         "repo": {"name": "test-repo", "class": "library"},
         "scope": {"includes": ["something"], "excludes": []},

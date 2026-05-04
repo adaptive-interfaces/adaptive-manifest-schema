@@ -1,5 +1,7 @@
 # Schema Evolution (adaptive-manifest-schema)
 
+<!-- Design for durability; do not introduce drift -->
+
 How changes are made to `adaptive-manifest-schema`.
 
 ## Principles
@@ -82,11 +84,6 @@ Schema changes follow SemVer:
 - **MAJOR** - breaking changes to required sections, field types, or validation semantics
 - **MINOR** - backward-compatible additions (new optional sections, new fields, new classes)
 - **PATCH** - fixes, documentation, tooling
-
-The current schema version is `adaptive-interfaces-manifest-1`.
-When breaking changes are required, a new version file (`schema/manifest-2.toml`)
-is created and the `schema_allowed` list is updated.
-Existing repos migrate at their own pace; both versions are valid during transition.
 
 ## Design Constraint
 

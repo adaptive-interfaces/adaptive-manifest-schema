@@ -6,8 +6,8 @@ cff-version: "1.2.0"
 type: software
 
 title: "adaptive-manifest-schema: Canonical MANIFEST.toml Schema for Adaptive Interfaces"
-version: 0.1.0
-date-released: 2026-05-03
+version: 0.2.0
+date-released: 2026-05-04
 
 authors:
   - family-names: Case

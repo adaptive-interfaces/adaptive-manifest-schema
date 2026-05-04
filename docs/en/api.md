@@ -1,5 +1,7 @@
 # API Reference (adaptive-manifest-schema)
 
+<!-- Design for durability; do not introduce drift -->
+
 Auto-generated from docstrings in `src/adaptive_manifest_schema/`.
 
 ---

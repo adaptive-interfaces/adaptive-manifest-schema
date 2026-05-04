@@ -292,3 +292,48 @@ Both schema versions remain valid during transition via `schema_allowed`.
   and `--require-tag` is passed.
 
 ---
+
+## D-009. Schema identifier naming
+
+**Status:** Accepted
+**Supersedes:** D-003 (partial)
+
+**Context:**
+D-003 established `"adaptive-interfaces-manifest-1"` as the schema identifier,
+following the SE pattern of including a numeric version suffix.
+D-008 established that versions are carried by git tags and the filename stays stable.
+The numeric suffix in the downstream identifier is now redundant.
+
+**Decision:**
+Two distinct identifier fields serve two distinct purposes:
+
+`schema` in downstream `MANIFEST.toml` files:
+
+- Value: `"adaptive-interfaces-manifest-schema"`
+- No numeric suffix.
+- Never changes, even when the schema version bumps.
+- The validator checks this against `schema_allowed`.
+
+`manifest_schema_id` in `manifest-schema.toml`:
+
+- Value: `"adaptive-interfaces-manifest-schema-1"`
+- Numeric suffix retained.
+- Identifies which version of the schema definition file this is.
+- When a breaking change ships, a new `manifest-schema.toml` has `-2`.
+
+`schema_allowed` in `manifest-schema.toml`:
+
+- Value: `["adaptive-interfaces-manifest-schema"]`
+- Never needs updating because downstream `schema` values never change.
+- Migration between schema versions is handled by git tag pinning in `schema_url`,
+  not by changing the `schema` string.
+
+**Consequences:**
+
+- All downstream `MANIFEST.toml` files declare `schema = "adaptive-interfaces-manifest-schema"`.
+- `manifest-schema.toml` declares `manifest_schema_id = "adaptive-interfaces-manifest-schema-1"`.
+- `schema_allowed = ["adaptive-interfaces-manifest-schema"]` in `manifest-schema.toml`.
+- `"adaptive-interfaces-manifest-1"` is retired.
+- D-003 versioning discussion is superseded by this decision and D-008 combined.
+
+---

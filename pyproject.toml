@@ -1,6 +1,7 @@
 # ============================================================
 # pyproject.toml (Python project configuration)
 # ============================================================
+# adaptive-manifest-schema
 # Updated: 2026-05-03
 # REQ.PYTHON: Python projects MUST include pyproject.toml as the single source of truth.
 # WHY: Centralizes project configuration.
@@ -197,5 +198,5 @@ force-include = {"manifest-schema.toml" = "adaptive_manifest_schema/manifest-sch
 # WHY: Version derived from git tags at build time
 source = "vcs"
 # Used when no git tags present (fresh clone, CI).
-fallback-version = "0.1.0"
+fallback-version = "0.2.0"
 tag-pattern = "^(?:v)?(?P<version>\\d+\\.\\d+\\.\\d+)$"
