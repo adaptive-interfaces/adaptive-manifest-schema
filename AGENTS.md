@@ -1,5 +1,7 @@
 # AGENTS.md (adaptive-manifest-schema)
 
+Agents must also follow `AGENT_CONDUCT.md`.
+
 ## Scope
 
 This repository provides the canonical `MANIFEST.toml` schema definition
@@ -33,7 +35,6 @@ If shell-specific commands are unavoidable, provide both:
 
 ```shell
 uv self update
-uv python pin 3.15
 uv sync --extra dev --extra docs --upgrade
 
 uvx pre-commit install
@@ -51,7 +52,7 @@ uv run python -m ruff check . --fix
 Run tests:
 
 ```shell
-uv run pytest
+uv run python -m pytest
 ```
 
 Validate:
@@ -113,12 +114,10 @@ One-line description of module purpose.
 
 ## Agent Task Assignment
 
-Before generating any schema definition, validator logic, or consuming code:
+Before generating any content or consuming code:
 
 1. Read `SKILL.md`; it is the operating guide, not optional documentation.
-2. Read `DECISIONS.md`; it explains why the schema is shaped the way it is.
-3. Confirm understanding of the schema versioning policy (see D-003).
-4. Confirm that no upstream adaptive-interfaces imports are introduced (see D-005).
+2. Read `DECISIONS.md`; it explains why the project is the way it is.
 
 ## pre-commit
 

@@ -1,11 +1,11 @@
 # adaptive-manifest-schema
 
-[![Adaptive Interfaces](https://img.shields.io/badge/adaptive--interfaces-compliant-blue?logo=github)](https://github.com/adaptive-interfaces)
+[![Adaptive Interfaces](https://img.shields.io/badge/adaptive--interfaces-schema-blue?logo=github)](https://github.com/adaptive-interfaces)
 [![PyPI](https://img.shields.io/pypi/v/adaptive-manifest-schema?logo=pypi&label=pypi)](https://pypi.org/project/adaptive-manifest-schema/)
 [![Docs Site](https://img.shields.io/badge/docs-site-blue?logo=github)](https://adaptive-interfaces.github.io/adaptive-manifest-schema/)
 [![Repo](https://img.shields.io/badge/repo-GitHub-black?logo=github)](https://github.com/adaptive-interfaces/adaptive-manifest-schema)
 [![Python 3.15+](https://img.shields.io/badge/python-3.15%2B-blue?logo=python)](https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/pyproject.toml)
-[![License](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 [![CI](https://github.com/adaptive-interfaces/adaptive-manifest-schema/actions/workflows/ci-python-zensical.yml/badge.svg?branch=main)](https://github.com/adaptive-interfaces/adaptive-manifest-schema/actions/workflows/ci-python-zensical.yml)
 [![Docs](https://github.com/adaptive-interfaces/adaptive-manifest-schema/actions/workflows/deploy-zensical.yml/badge.svg?branch=main)](https://github.com/adaptive-interfaces/adaptive-manifest-schema/actions/workflows/deploy-zensical.yml)
@@ -85,15 +85,16 @@ See `DECISIONS.md D-006` for full rationale.
 Open a machine terminal where you want the project:
 
 ```shell
-git clone https://github.com/structural-explainability/se-manifest-schema
+git clone https://github.com/adaptive-interfaces/adaptive-manifest-schema
 
-cd se-manifest-schema
+cd adaptive-manifest-schema
 code .
 ```
 
 ### In a VS Code terminal
 
 ```shell
+# uv cache clean # if corrupted
 uv self update
 uv python pin 3.15
 uv sync --extra dev --extra docs --upgrade
@@ -124,7 +125,7 @@ git push -u origin main
 
 ## Agent Usage
 
-This repository is structured for agent consumption.
+This repository is structured for agent-assisted maintenance.
 Read these files in order before generating any artifact:
 
 1. [`MANIFEST.toml`](./MANIFEST.toml) - repository contract and agent configuration
@@ -132,17 +133,6 @@ Read these files in order before generating any artifact:
 3. [`DECISIONS.md`](./DECISIONS.md) - design rationale
 4. [`AGENTS.md`](./AGENTS.md) - workflow requirements
 5. [`AGENT_CONDUCT.md`](./AGENT_CONDUCT.md) - behavioral constraints
-
-## Working with Agents
-
-Agents may accumulate context drift over long sessions.
-Rereading may anchor them back to the repo's constraints.
-On long context windows, asking the agent to reread key documents may help.
-
-```text
-Please reread MANIFEST.toml, SKILL.md, and AGENTS.md
-before continuing.
-```
 
 ## Documentation
 

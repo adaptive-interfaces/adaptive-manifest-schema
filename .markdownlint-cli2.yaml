@@ -1,0 +1,56 @@
+# ============================================================
+# .markdownlint-cli2.yaml (Markdownlint CLI2 configuration)
+# ============================================================
+# Added: 2026-05-04
+# WHY: Generated and dependency directories are not source content.
+# REQ: Markdown lint should check authored Markdown, not virtual
+#      environments, dependency trees, build output, or generated docs.
+
+globs:
+  - "**/*.md"
+
+ignores:
+  - ".venv/**"
+  - "**/.venv/**"
+  - "node_modules/**"
+  - "**/node_modules/**"
+  - "site/**"
+  - "**/site/**"
+  - "dist/**"
+  - "**/dist/**"
+  - "build/**"
+  - "**/build/**"
+  - ".ruff_cache/**"
+  - "**/.ruff_cache/**"
+  - ".pytest_cache/**"
+  - "**/.pytest_cache/**"
+  - ".mypy_cache/**"
+  - "**/.mypy_cache/**"
+  - ".pyright/**"
+  - "**/.pyright/**"
+  - ".tox/**"
+  - "**/.tox/**"
+  - ".nox/**"
+  - "**/.nox/**"
+  - ".uv-cache/**"
+  - "**/.uv-cache/**"
+  - "htmlcov/**"
+  - "**/htmlcov/**"
+
+config:
+  default: true
+
+  MD013:
+    line_length: 100
+    headings: false
+    tables: false
+    code_blocks: false
+
+  MD025: false
+
+  MD033:
+    allowed_elements:
+      - meta
+      - link
+      - details
+      - summary

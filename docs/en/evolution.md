@@ -32,7 +32,7 @@ Changes may include:
 
 ```shell
 uv run adaptive-manifest validate
-uv run pytest
+uv run python -m pytest
 ```
 
 ### 4. Commit and tag

@@ -114,7 +114,7 @@ uv run python -m zensical build
 
 ```shell
 git add -A
-git commit -m "Release X.Y.Z"
+git commit -m "Prep X.Y.Z"
 git push -u origin main
 ```
 

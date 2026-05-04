@@ -22,6 +22,7 @@
     "yzhang.markdown-all-in-one", // Shortcuts, TOC, formatting for .md files
     "bierner.markdown-preview-github-styles", // GitHub-style markdown preview
     "esbenp.prettier-vscode", // Used for Markdown formatting
+    "DavidAnson.vscode-markdownlint", // Markdown linting (style and consistency checks)
     // "bierner.markdown-mermaid", // Diagram rendering in markdown (flowcharts, etc.)
     // ============================================================
     // === DATA FILES AND CONFIGURATION ===

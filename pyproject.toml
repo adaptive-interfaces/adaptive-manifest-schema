@@ -117,7 +117,7 @@ exclude = [
 ]
 line-length = 88 # WHY: PEP 8 standard, wrap when possible.
 preview = false # WHY: Stable features only; avoid preview features.
-target-version = "py313" # WHY: 3.14 not available yet; match latest supported Python version.
+target-version = "py313" # WHY: 3.15 not available yet; match latest supported Python version.
 unsafe-fixes = false # WHY: Avoid potentially unsafe automatic fixes.
 
 [tool.ruff.format]
@@ -181,7 +181,11 @@ convention = "google"   # ALT: "numpy" choose one, never mix.
 
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling", "hatch-vcs"]
+requires = [
+  "hatchling", # WHY: Build tool for packaging and publishing.
+  "hatch-vcs", # WHY: Required for versioning from git tags at build time.
+  #"pathspec>=1.1.0", # WHY: Required by hatch-vcs for .gitignore parsing.
+]
 
 [tool.hatch.build.hooks.vcs]
 # WHY: Writes computed version into src/*/_version.py at build time.
@@ -197,6 +201,9 @@ force-include = {"manifest-schema.toml" = "adaptive_manifest_schema/manifest-sch
 [tool.hatch.version]
 # WHY: Version derived from git tags at build time
 source = "vcs"
+# WHY: Allow hatch-vcs/setuptools-scm to find the Git root when the project
+# is built from a subdirectory, temporary build directory, or isolated build env.
+search_parent_directories = true
 # Used when no git tags present (fresh clone, CI).
 fallback-version = "0.2.0"
 tag-pattern = "^(?:v)?(?P<version>\\d+\\.\\d+\\.\\d+)$"

@@ -118,7 +118,7 @@ jobs:
         run: uvx validate-pyproject
 
       - name: C5) Pyright (type check)
-        run: uv run pyright
+        run: uv run python -m pyright
 
       - name: C6) Validate built artifacts
         run: uv run twine check dist/*
