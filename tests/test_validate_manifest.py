@@ -1,4 +1,7 @@
-"""Tests for validate_manifest.py - MANIFEST.toml conformance."""
+"""tests/test_validate_manifest.py.
+
+Tests for validate_manifest.py - MANIFEST.toml conformance.
+"""
 
 import os
 from pathlib import Path
@@ -23,6 +26,18 @@ def _minimal_schema() -> ManifestSchemaData:
             "section": {
                 "repo": {"required": True, "allowed_fields": ["name", "class"]},
                 "scope": {"required": True, "allowed_fields": ["includes", "excludes"]},
+                "agent": {
+                    "required": False,
+                    "allowed_fields": [
+                        "conformance",
+                        "skill",
+                        "permissions",
+                        "checkpoint",
+                        "scope",
+                        "sensitive_paths",
+                        "stop_on_ambiguity",
+                    ],
+                },
             },
             "field": {
                 "repo": {
@@ -33,11 +48,20 @@ def _minimal_schema() -> ManifestSchemaData:
                     "includes": {"type": "list[string]", "required": True},
                     "excludes": {"type": "list[string]", "required": True},
                 },
+                "agent": {
+                    "conformance": {"type": "string", "required": False},
+                    "skill": {"type": "string", "required": False},
+                    "permissions": {"type": "string", "required": False},
+                    "checkpoint": {"type": "string", "required": False},
+                    "scope": {"type": "string", "required": False},
+                    "sensitive_paths": {"type": "list[string]", "required": False},
+                    "stop_on_ambiguity": {"type": "boolean", "required": False},
+                },
             },
             "class": {
                 "library": {
                     "required_sections": ["repo", "scope"],
-                    "optional_sections": [],
+                    "optional_sections": ["agent"],
                     "forbidden_sections": [],
                 }
             },
@@ -142,3 +166,64 @@ def test_missing_repo_section_detected() -> None:
     del manifest["repo"]
     errors = validate_manifest(manifest, _minimal_schema())
     assert any("repo" in e for e in errors)
+
+
+# --- Agent safety field enum validation ---
+
+
+def test_valid_agent_permissions_passes() -> None:
+    for value in ("read-only", "read-generate", "read-write"):
+        manifest = {**_minimal_manifest(), "agent": {"permissions": value}}
+        errors = validate_manifest(manifest, _minimal_schema())
+        assert errors == [], f"Expected no errors for permissions={value}"
+
+
+def test_invalid_agent_permissions_detected() -> None:
+    manifest = {**_minimal_manifest(), "agent": {"permissions": "full-access"}}
+    errors = validate_manifest(manifest, _minimal_schema())
+    assert any("permissions" in e and "full-access" in e for e in errors)
+
+
+def test_valid_agent_checkpoint_passes() -> None:
+    for value in ("human-review-required", "automated"):
+        manifest = {**_minimal_manifest(), "agent": {"checkpoint": value}}
+        errors = validate_manifest(manifest, _minimal_schema())
+        assert errors == [], f"Expected no errors for checkpoint={value}"
+
+
+def test_invalid_agent_checkpoint_detected() -> None:
+    manifest = {**_minimal_manifest(), "agent": {"checkpoint": "none"}}
+    errors = validate_manifest(manifest, _minimal_schema())
+    assert any("checkpoint" in e and "none" in e for e in errors)
+
+
+def test_valid_agent_scope_passes() -> None:
+    for value in ("this-repo-only", "multi-repo"):
+        manifest = {**_minimal_manifest(), "agent": {"scope": value}}
+        errors = validate_manifest(manifest, _minimal_schema())
+        assert errors == [], f"Expected no errors for scope={value}"
+
+
+def test_invalid_agent_scope_detected() -> None:
+    manifest = {**_minimal_manifest(), "agent": {"scope": "everywhere"}}
+    errors = validate_manifest(manifest, _minimal_schema())
+    assert any("scope" in e and "everywhere" in e for e in errors)
+
+
+def test_sensitive_paths_must_be_list() -> None:
+    manifest = {**_minimal_manifest(), "agent": {"sensitive_paths": "data/"}}
+    errors = validate_manifest(manifest, _minimal_schema())
+    assert any("sensitive_paths" in e for e in errors)
+
+
+def test_stop_on_ambiguity_must_be_bool() -> None:
+    manifest = {**_minimal_manifest(), "agent": {"stop_on_ambiguity": "yes"}}
+    errors = validate_manifest(manifest, _minimal_schema())
+    assert any("stop_on_ambiguity" in e for e in errors)
+
+
+def test_agent_section_absent_passes() -> None:
+    """Omitting [agent] entirely is valid; conservative defaults apply."""
+    manifest = _minimal_manifest()
+    errors = validate_manifest(manifest, _minimal_schema())
+    assert errors == []

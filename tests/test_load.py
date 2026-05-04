@@ -8,10 +8,19 @@ import pytest
 
 from adaptive_manifest_schema.load import (
     get_git_tag,
+    get_repo_version,
     load_manifest,
     load_schema,
     load_toml,
 )
+
+
+def test_get_git_tag_not_found(tmp_path: Path) -> None:
+    with (
+        patch("shutil.which", return_value=None),
+        pytest.raises(RuntimeError, match="git executable"),
+    ):
+        get_git_tag()
 
 
 def test_load_toml_valid(tmp_path: Path) -> None:
@@ -22,9 +31,7 @@ def test_load_toml_valid(tmp_path: Path) -> None:
 
 
 def test_load_schema_found(tmp_path: Path) -> None:
-    schema_dir = tmp_path / "schema"
-    schema_dir.mkdir()
-    (schema_dir / "manifest-1.toml").write_text(
+    (tmp_path / "manifest-schema.toml").write_text(
         '[meta]\nversion = "1.0.0"\n', encoding="utf-8"
     )
     old = Path.cwd()
@@ -40,21 +47,8 @@ def test_load_schema_missing(tmp_path: Path) -> None:
     old = Path.cwd()
     os.chdir(tmp_path)
     try:
-        with pytest.raises(FileNotFoundError, match="manifest-1.toml"):
+        with pytest.raises(FileNotFoundError, match="manifest-schema.toml"):
             load_schema()
-    finally:
-        os.chdir(old)
-
-
-def test_load_manifest_found(tmp_path: Path) -> None:
-    (tmp_path / "MANIFEST.toml").write_text(
-        'schema = "adaptive-interfaces-manifest-1"\n', encoding="utf-8"
-    )
-    old = Path.cwd()
-    os.chdir(tmp_path)
-    try:
-        data = load_manifest()
-        assert data["schema"] == "adaptive-interfaces-manifest-1"
     finally:
         os.chdir(old)
 
@@ -69,16 +63,16 @@ def test_load_manifest_missing(tmp_path: Path) -> None:
         os.chdir(old)
 
 
-def test_load_manifest_explicit_path(tmp_path: Path) -> None:
-    p = tmp_path / "OTHER.toml"
-    p.write_text('[repo]\nname = "test"\n', encoding="utf-8")
-    data = load_manifest(p)
-    assert data["repo"]["name"] == "test"
+def test_get_repo_version_valid() -> None:
+    manifest = {"repo": {"version": "0.2.0", "name": "x"}}
+    assert get_repo_version(manifest) == "0.2.0"
 
 
-def test_get_git_tag_no_git() -> None:
-    with (
-        patch("shutil.which", return_value=None),
-        pytest.raises(RuntimeError, match="git executable"),
-    ):
-        get_git_tag()
+def test_get_repo_version_missing_repo() -> None:
+    with pytest.raises(ValueError, match="repo"):
+        get_repo_version({})
+
+
+def test_get_repo_version_missing_version() -> None:
+    with pytest.raises(ValueError, match="version"):
+        get_repo_version({"repo": {"name": "x"}})

@@ -1,5 +1,6 @@
-"""validate_manifest.py - Validates any MANIFEST.toml against the schema.
+"""src/adaptive_manifest_schema/validate_manifest.py.
 
+Validates any MANIFEST.toml against the schema.
 Imported by consumers to validate their own MANIFEST.toml.
 Does not know about git tags or version alignment.
 
@@ -10,11 +11,16 @@ Checks:
   - no unknown sections (if require_known_sections_only is set)
   - no unknown fields within sections (if require_known_fields_only is set)
   - required fields within sections are present
+  - enum values for agent safety fields are from the allowed set
 """
 
 from typing import Any, cast
 
 from adaptive_manifest_schema.types.manifest_schema import ManifestSchemaData
+
+AGENT_PERMISSIONS_ALLOWED = {"read-only", "read-generate", "read-write"}
+AGENT_CHECKPOINT_ALLOWED = {"human-review-required", "automated"}
+AGENT_SCOPE_ALLOWED = {"this-repo-only", "multi-repo"}
 
 
 def _get_validation_rules(schema: ManifestSchemaData) -> dict[str, Any]:
@@ -42,6 +48,49 @@ def _get_section_def(
     if not isinstance(value, dict):
         return None
     return value  # type: ignore[return-value]
+
+
+def _validate_agent_safety_fields(agent_data: dict[str, Any]) -> list[str]:
+    """Validate enum values for agent safety fields.
+
+    Args:
+        agent_data: Contents of the [agent] section.
+
+    Returns:
+        List of error strings. Empty list means valid.
+    """
+    errors: list[str] = []
+
+    permissions = agent_data.get("permissions")
+    if permissions is not None and permissions not in AGENT_PERMISSIONS_ALLOWED:
+        errors.append(
+            f"[agent].permissions: '{permissions}' is not a valid value. "
+            f"Allowed: {sorted(AGENT_PERMISSIONS_ALLOWED)}"
+        )
+
+    checkpoint = agent_data.get("checkpoint")
+    if checkpoint is not None and checkpoint not in AGENT_CHECKPOINT_ALLOWED:
+        errors.append(
+            f"[agent].checkpoint: '{checkpoint}' is not a valid value. "
+            f"Allowed: {sorted(AGENT_CHECKPOINT_ALLOWED)}"
+        )
+
+    scope = agent_data.get("scope")
+    if scope is not None and scope not in AGENT_SCOPE_ALLOWED:
+        errors.append(
+            f"[agent].scope: '{scope}' is not a valid value. "
+            f"Allowed: {sorted(AGENT_SCOPE_ALLOWED)}"
+        )
+
+    sensitive_paths = agent_data.get("sensitive_paths")
+    if sensitive_paths is not None and not isinstance(sensitive_paths, list):
+        errors.append("[agent].sensitive_paths: must be a list of strings")
+
+    stop_on_ambiguity = agent_data.get("stop_on_ambiguity")
+    if stop_on_ambiguity is not None and not isinstance(stop_on_ambiguity, bool):
+        errors.append("[agent].stop_on_ambiguity: must be a boolean")
+
+    return errors
 
 
 def validate_manifest(
@@ -156,5 +205,10 @@ def validate_manifest(
             field_def_typed: dict[str, Any] = cast(dict[str, Any], field_def)
             if field_def_typed.get("required") and field_name not in section_data:
                 errors.append(f"[{section_name}].{field_name}: required field missing")
+
+    # agent safety field enum validation
+    agent_data = manifest.get("agent")
+    if isinstance(agent_data, dict):
+        errors.extend(_validate_agent_safety_fields(cast(dict[str, Any], agent_data)))
 
     return errors

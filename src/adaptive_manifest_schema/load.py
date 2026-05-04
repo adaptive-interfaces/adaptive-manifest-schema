@@ -11,7 +11,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tomllib
-from typing import Any
+from typing import Any, cast
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -20,8 +20,8 @@ def load_toml(path: Path) -> dict[str, Any]:
 
 
 def load_schema() -> dict[str, Any]:
-    """Load schema/manifest-1.toml from repo root."""
-    path = Path("schema") / "manifest-1.toml"
+    """Load manifest-schema.toml from repo root."""
+    path = Path("manifest-schema.toml")
     if not path.exists():
         raise FileNotFoundError(f"Schema file not found: {path}")
     return load_toml(path)
@@ -33,6 +33,18 @@ def load_manifest(path: Path | None = None) -> dict[str, Any]:
     if not target.exists():
         raise FileNotFoundError(f"MANIFEST.toml not found: {target}")
     return load_toml(target)
+
+
+def get_repo_version(manifest: dict[str, Any]) -> str:
+    """Extract and validate repo.version from manifest."""
+    repo = manifest.get("repo")
+    if not isinstance(repo, dict):
+        raise ValueError("SE_MANIFEST.toml missing or invalid [repo] section")
+    typed: dict[str, object] = cast(dict[str, object], repo)
+    version = typed.get("version")
+    if not isinstance(version, str):
+        raise ValueError("SE_MANIFEST.toml missing or invalid repo.version")
+    return version
 
 
 def get_git_tag() -> str:

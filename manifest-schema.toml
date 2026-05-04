@@ -4,6 +4,32 @@
 # Canonical adaptive-interfaces-manifest-1 schema definition.
 # Defines required sections, fields, and validation rules for
 # MANIFEST.toml files in the Adaptive Interfaces ecosystem.
+#
+# Navigation:
+#   [meta]                schema identity
+#   [manifest]            manifest file contract
+#   [manifest.identity]   required top-level fields
+#
+#   SECTION REGISTRY      what sections are allowed and what they contain
+#     [section.meta]
+#     [section.repo]
+#     [section.layer]
+#     [section.depends]
+#     [section.provides]
+#     [section.scope]
+#     [section.citation]
+#     --- proposed: adaptive-interfaces-manifest-2 ---
+#     [section.package]
+#     [section.docs]
+#     [section.ci]
+#     [section.release]
+#     [section.agent]     <-- agent behavioral directives and safety constraints
+#     [section.conventions]
+#
+#   FIELD DEFINITIONS     types and required status per field
+#   CLASS REGISTRY        which sections each repo class requires
+#   VALIDATION RULES      enforcement policy
+#   NOTES                 non-goals and manifest role
 # ============================================================
 
 [meta]
@@ -28,7 +54,14 @@ schema_allowed = ["adaptive-interfaces-manifest-1"]
 schema_url_field = "schema_url"
 schema_url_required = true
 
-# Section registry
+# ============================================================
+# SECTION REGISTRY
+# Defines what sections are permitted and what fields each contains.
+# required = true means every repo of every class must include this section.
+# required = false means the section is optional or class-specific.
+# ============================================================
+
+# --- Core sections (required for all classes) ---
 
 [section.meta]
 required = true
@@ -68,6 +101,10 @@ required = true
 description = "Citation metadata pointer."
 allowed_fields = ["cff", "preferred"]
 
+# --- Proposed sections (adaptive-interfaces-manifest-2) ---
+# These sections are in active use but not yet formally versioned.
+# See DECISIONS.md D-007 and D-008.
+
 [section.package]
 required = false
 description = "Python package identity and CLI configuration."
@@ -90,15 +127,37 @@ allowed_fields = ["validate_step", "changelog_sections"]
 
 [section.agent]
 required = false
-description = "Agent behavioral directives."
-allowed_fields = ["conformance", "skill"]
+description = """
+Agent behavioral directives and safety constraints.
+Declares what agents are authorized to do in this repo,
+what checkpoints are required, and what paths are off-limits.
+All fields are optional; omitting them does not grant permissions.
+Conservative defaults apply when fields are absent.
+See DECISIONS.md D-008 for rationale.
+"""
+allowed_fields = [
+    "conformance",
+    "skill",
+    "permissions",
+    "checkpoint",
+    "scope",
+    "sensitive_paths",
+    "stop_on_ambiguity",
+]
 
 [section.conventions]
 required = false
 description = "Conventions source for ACS scaffold conformance."
 allowed_fields = ["source"]
 
-# Field definitions
+# ============================================================
+# FIELD DEFINITIONS
+# Defines the type and required status of each field within each section.
+# Format: field_name = {type = "...", required = true|false}
+# Allowed types: string, boolean, list[string], integer
+# ============================================================
+
+# --- Core section fields ---
 
 [field.meta]
 purpose = {type = "string", required = true}
@@ -132,6 +191,8 @@ excludes = {type = "list[string]", required = true}
 cff = {type = "string", required = true}
 preferred = {type = "string", required = true}
 
+# --- Proposed section fields ---
+
 [field.package]
 python_name = {type = "string", required = true}
 cli = {type = "boolean", required = false}
@@ -153,13 +214,57 @@ validate_step = {type = "string", required = false}
 changelog_sections = {type = "list[string]", required = false}
 
 [field.agent]
+# Behavioral protocol reference
 conformance = {type = "string", required = false}
+# WHY: URL to ACS or equivalent behavioral protocol.
+# Agent must apply this protocol before generating any artifact.
+
 skill = {type = "string", required = false}
+# WHY: Path to the domain operating guide (SKILL.md).
+# Agent reads this after ACS conformance is complete.
+
+permissions = {type = "string", required = false}
+# WHY: Declares the authorized operation scope for agents in this repo.
+# Allowed values:
+#   read-only        inspect and analyze; no artifact generation
+#   read-generate    read files and produce new artifacts; no direct writes (default)
+#   read-write       explicit tasks that modify existing files; requires DECISIONS.md entry
+# Omitting this field implies read-generate.
+
+checkpoint = {type = "string", required = false}
+# WHY: Declares the required human review checkpoint before agent output is applied.
+# Allowed values:
+#   human-review-required    all output reviewed before applying (default)
+#   automated                CI-gated; no human review required
+# Omitting this field implies human-review-required.
+
+scope = {type = "string", required = false}
+# WHY: Declares the filesystem boundary for agent operations.
+# Allowed values:
+#   this-repo-only     agent operates only within this repository (default)
+#   multi-repo         cross-repo operations permitted; must be named in task
+# Omitting this field implies this-repo-only.
+
+sensitive_paths = {type = "list[string]", required = false}
+# WHY: Paths the agent must not read, reproduce, or reference.
+# Agent must stop and request human guidance if a task requires access.
+# Example: ["data/", ".env", "secrets/", "credentials/"]
+
+stop_on_ambiguity = {type = "boolean", required = false}
+# WHY: When true, agent must stop and report rather than guess
+# when task scope is unclear or evidence is insufficient.
+# Omitting this field implies true.
 
 [field.conventions]
 source = {type = "string", required = true}
+# WHY: URL or path to the conventions source repo.
+# Agent clones this and applies ACS conformance before scaffolding.
 
-# Class registry
+# ============================================================
+# CLASS REGISTRY
+# Defines which sections are required, optional, or forbidden
+# for each declared repo class.
+# ============================================================
 
 [class.library]
 required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "citation"]
@@ -196,11 +301,19 @@ required_sections = ["meta", "repo", "layer", "depends", "provides", "scope", "c
 optional_sections = ["package", "docs", "ci", "release", "agent", "conventions"]
 forbidden_sections = []
 
-# Validation rules
+# ============================================================
+# VALIDATION RULES
+# Controls how strictly the validator enforces the schema.
+# ============================================================
 
 [validation]
 require_known_sections_only = false
+# WHY: false allows proposed sections to pass validation while manifest-2 is pending.
+# Set to true once manifest-2 is finalized.
+
 require_known_fields_only = false
+# WHY: Same rationale as require_known_sections_only.
+
 require_single_repo_class = true
 require_repo_name_to_match_declared_class = false
 require_declared_class_to_exist_in_class_registry = true
@@ -209,6 +322,10 @@ require_manifest_filename_exact = true
 [validation.defaults]
 empty_optional_lists_allowed = true
 empty_required_lists_allowed = true
+
+# ============================================================
+# NOTES
+# ============================================================
 
 [notes]
 manifest_role = "Declares repository identity, scope, role, and tooling configuration."

@@ -5,8 +5,10 @@
 
 schema = "adaptive-interfaces-manifest-1"
 schema_url = "https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/schema/manifest-1.md"
-# NOTE: This repo defines the schema. It bootstraps by declaring itself
-# under manifest-1 until manifest-2 is published here.
+# NOTE: This repo defines the schema.
+# The schema_url points to the canonical source of truth for the schema,
+# which is versioned and documented in the repository itself.
+# This allows for clear reference and versioning of the schema as it evolves.
 # See DECISIONS.md D-003.
 
 # === Identity ===
@@ -64,7 +66,7 @@ excludes = [
   "schemas specific to other organizations",
 ]
 
-# === Package (proposed: adaptive-interfaces-manifest-2) ===
+# === Package  ===
 
 [package]
 python_name = "adaptive_manifest_schema"
@@ -75,8 +77,7 @@ cli_description = "Validate MANIFEST.toml files against the adaptive-interfaces 
 # WHY: cli=true drives [project.scripts] in pyproject.toml and scaffolds
 # cli.py, __init__.py, and __main__.py boilerplate.
 
-# === Docs (proposed: adaptive-interfaces-manifest-2) ===
-
+# === Docs ===
 [docs]
 enabled = true
 tool = "zensical"
@@ -84,7 +85,7 @@ deploy = true
 # WHY: enabled=true drives zensical.toml, docs build step in CI.
 # deploy=true drives deploy-zensical.yml workflow for GitHub Pages.
 
-# === CI (proposed: adaptive-interfaces-manifest-2) ===
+# === CI ===
 
 [ci]
 link_check = true
@@ -94,7 +95,7 @@ actionlint = false
 # dependabot=true drives dependabot.yml (GitHub Actions updates only).
 # actionlint=false - org-level only, not per-repo.
 
-# === Release (proposed: adaptive-interfaces-manifest-2) ===
+# === Release ===
 
 [release]
 validate_step = "uv run adaptive-manifest validate"
@@ -106,7 +107,7 @@ changelog_sections = [
   "Links",
 ]
 
-# === Agent (proposed: adaptive-interfaces-manifest-2) ===
+# === Agent ===
 
 [agent]
 conformance = "https://github.com/adaptive-interfaces/adaptive-conformance-specification"
@@ -115,8 +116,16 @@ conformance = "https://github.com/adaptive-interfaces/adaptive-conformance-speci
 skill = "SKILL.md"
 # WHY: SKILL.md is the domain operating guide.
 # Authored after interface is stable (see DECISIONS.md D-003).
+permissions = "read-generate"
+# WHY: Agents read files and produce artifacts. No direct writes. See D-006.
+checkpoint = "human-review-required"
+# WHY: All agent output reviewed before applying. See D-006.
+scope = "this-repo-only"
+# WHY: Agent operates within this repository only. See D-006.
+stop_on_ambiguity = true
+# WHY: Agent stops and reports rather than guessing. See D-006.
 
-# === Conventions (proposed: adaptive-interfaces-manifest-2) ===
+# === Conventions ===
 
 [conventions]
 source = "https://github.com/structural-explainability/se-manifest-schema"

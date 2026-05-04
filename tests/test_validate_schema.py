@@ -1,4 +1,7 @@
-"""Tests for validate_schema.py - schema internal consistency."""
+"""tests/test_validate_schema.py.
+
+Tests for validate_schema.py - schema internal consistency.
+"""
 
 from typing import cast
 

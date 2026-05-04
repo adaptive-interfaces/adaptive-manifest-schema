@@ -11,12 +11,12 @@
 # ============================================================
 
 [project]
-name = "adaptive-manifest-schema"
+name = "adaptive-manifest-schema" # Package distribution name (lowercase and dashes).
 readme = "README.md"
 requires-python = ">=3.15"
-dynamic = ["version"]
+dynamic = ["version"] # WHY: Version is computed from git tags at build time (see [tool.hatch.version] below).
 description = "Canonical MANIFEST.toml schema and validation for the Adaptive Interfaces ecosystem."
-license = { file = "LICENSE" }
+license = "MIT"
 authors = [
     { name = "Adaptive Interfaces", email = "adaptive-interfaces@github.com" },
 ]
@@ -38,107 +38,164 @@ keywords = [
     "toml",
 ]
 dependencies = [
-    "PyYAML",
+    "PyYAML", # WHY: Required to read version from CITATION.cff during sync.
 ]
 
 [project.optional-dependencies]
 dev = [
-    "build",
-    "packaging",
+    "build", # WHY: build tool required for packaging and publishing.
+    "packaging", # WHY: Required by validate-pyproject for dependency and license validation.
     "pre-commit",
     "pyright",
     "pytest",
     "pytest-cov",
     "ruff",
-    "twine",
+    "twine",  # WHY: Required for artifact validation (twine check dist/*).
 ]
 
 docs = [
-    "zensical==0.0.37",
+    "mkdocstrings-python", # WHY: Required for API reference generation in documentation.
+    "zensical==0.0.37", # WHY: Link resolution fails with newer versions; pinning to a known working version.,
 ]
 
 [project.scripts]
 adaptive-manifest = "adaptive_manifest_schema.cli:main"
+# WHY: Defines the CLI entry point. Only one:
+# one tool, multiple subcommands is cleaner and
+# matches how tools like git, uv, and se-constitution work.
 
 [project.urls]
-Homepage = "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
+Homepage = "https://adaptive-interfaces.github.io/adaptive-manifest-schema/"
 Repository = "https://github.com/adaptive-interfaces/adaptive-manifest-schema"
 Documentation = "https://adaptive-interfaces.github.io/adaptive-manifest-schema/"
+Issues = "https://github.com/adaptive-interfaces/adaptive-manifest-schema/issues"
+Changelog = "https://github.com/adaptive-interfaces/adaptive-manifest-schema/blob/main/CHANGELOG.md"
 
 # ============================================================
 # SECTION 2: TOOL CONFIGURATION
 # ============================================================
 
+# === PYRIGHT (TYPE CHECKING HELPS FIND COMMON ERRORS BEFORE THE CODE RUNS) ===
+
 [tool.pyright]
-include = ["src", "tests"]
-extraPaths = ["src", "tests"]
-exclude = ["**/node_modules", "**/.*", ".venv", "**/__pycache__", "dist", "build"]
+# CUSTOM: Pyright configuration for static type checking.
+# WHY: Strict type checking helps catch bugs early.
+include = ["src", "tests"] # WHY: Include both source and test code for comprehensive type checking.
+extraPaths = ["src", "tests"] # WHY: Ensure imports are resolved relative to src/ for consistent behavior across environments.
+exclude = [ "**/node_modules", "**/.*", ".venv","**/__pycache__","dist","build"]
 pythonVersion = "3.15"
-reportMissingTypeStubs = "none"
-reportMissingImports = "warning"
-reportPrivateUsage = "none"
-typeCheckingMode = "strict"
+reportMissingTypeStubs = "none" # WHY: Avoid warnings from third-party libraries without type stubs.
+reportMissingImports = "warning" # WHY: Warn about missing imports to catch potential issues, but allow flexibility in notebooks and dynamic code.
+reportPrivateUsage = "none" # WHY: Allow usage of private members (e.g., _version.py) without warnings, as this is common in Python projects.
+typeCheckingMode = "strict" # strict | basic | off
 
 [[tool.pyright.executionEnvironments]]
 root = "tests"
-typeCheckingMode = "basic"
+
+# === PYTEST (VERIFY LOGIC) ===
 
 [tool.pytest.ini_options]
+# WHY: Consistent test discovery and coverage visibility.
 minversion = "7.0"
 testpaths = ["tests"]
 addopts = "--cov=adaptive_manifest_schema --cov-report=term-missing --cov-fail-under=75"
 
+# === RUFF (PYTHON FORMATTING AND LINTING) ===
+
 [tool.ruff]
+# WHY: Fast linting and formatting in one tool.
 exclude = [
-    ".eggs", "*.egg-info", ".ruff_cache", ".venv",
-    "__pycache__", "build", "dist", "site",
+    ".eggs",
+    "*.egg-info",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "site",
 ]
-line-length = 88
-preview = false
-target-version = "py313"
-unsafe-fixes = false
+line-length = 88 # WHY: PEP 8 standard, wrap when possible.
+preview = false # WHY: Stable features only; avoid preview features.
+target-version = "py313" # WHY: 3.14 not available yet; match latest supported Python version.
+unsafe-fixes = false # WHY: Avoid potentially unsafe automatic fixes.
 
 [tool.ruff.format]
-indent-style = "space"
-line-ending = "auto"
-quote-style = "preserve"
+# WHY: Formatter choices should be stable to keep diffs small and predictable.
+indent-style = "space" # See also .gitattributes for indent style.
+line-ending = "auto" # Match existing files and let .gitattributes handle it.
+quote-style = "preserve" # Preserve existing quote styles to minimize churn.
 
 [tool.ruff.lint]
+# WHY: Baseline + stricter categories:
 select = [
-    "E", "F", "W", "I", "UP", "B",
-    "PTH", "C4", "SIM", "RET",
-    "D", "S",
+    "E",  # Basic syntax and structural correctness
+    "F",  # Undefined names and unused imports
+    "W",  # Warnings that catch easy issues early
+    "I",  # Deterministic import ordering
+    "UP", # Modern Python constructs
+    "B",  # Common bug patterns
+
+    "PTH", # Prefer pathlib patterns
+    "C4",  # Comprehension correctness and clarity
+    "SIM", # Simplify obvious complexity
+    "RET", # Return practices
+
+    "D", # Docstring standards (see convention below)
+    "S", # Security checks (with deliberate exceptions)
 ]
-ignore = ["E501", "D203", "D213", "S101"]
+ignore = [
+    "E501", # line length handled by formatter
+    "D203", # conflicts with D211
+    "D213", # conflicts with D212 (Google standard summary placement)
+    "S101", # allow assert (tests + internal invariants)
+]
 
 [tool.ruff.lint.isort]
+# WHY: Ordering imports helps keep code diffs (differences) readable.
 force-sort-within-sections = true
 
+# === PER-FILE IGNORES (DEPENDS ON DOCSTRING POLICY) ===
+
 [tool.ruff.lint.per-file-ignores]
-"src/**/__init__.py" = ["F401"]
-"src/**/_version.py" = ["ALL"]
+# WHY: Some files must not be auto-modified.
+"src/**/__init__.py" = ["F401"]     # Allow re-export patterns
+"src/**/_version.py" = ["ALL"]      # Auto-generated file (do not lint)
 "tests/**/*.py" = ["D", "B018", "B011", "S101"]
 "src/**/py.typed" = ["ALL"]
 
+# === CHOOSE PROJECT DOC STYLE ===
+
 [tool.ruff.lint.pydocstyle]
-convention = "google"
+convention = "google"   # ALT: "numpy" choose one, never mix.
+
 
 # ============================================================
-# SECTION 3: BUILD SYSTEM
+# SECTION 3: BUILD SYSTEM (boilerplate; CUSTOM src/ agreement)
 # ============================================================
+#
+# REQ.PROJECT: A build system MUST be declared for package discovery and publishing.
+# REQ.STRUCTURE: All importable code MUST live under src/.
+# WHY src/ layout: Prevents accidental imports from the repo root;
+# ensures consistent behavior across IDEs, tests, CI, and PyPI.
 
 [build-system]
 build-backend = "hatchling.build"
 requires = ["hatchling", "hatch-vcs"]
 
 [tool.hatch.build.hooks.vcs]
+# WHY: Writes computed version into src/*/_version.py at build time.
+# CUSTOM: Must match src/ folders.
 version-file = "src/adaptive_manifest_schema/_version.py"
 
 [tool.hatch.build.targets.wheel]
+# CUSTOM: Must match src/ folders.
 packages = ["src/adaptive_manifest_schema"]
-force-include = {"schema/manifest-1.toml" = "adaptive_manifest_schema/manifest-1.toml"}
+force-include = {"manifest-schema.toml" = "adaptive_manifest_schema/manifest-schema.toml"}
+# WHY: Include manifest-schema.toml in the package for runtime access to the schema definition.
 
 [tool.hatch.version]
+# WHY: Version derived from git tags at build time
 source = "vcs"
+# Used when no git tags present (fresh clone, CI).
 fallback-version = "0.1.0"
 tag-pattern = "^(?:v)?(?P<version>\\d+\\.\\d+\\.\\d+)$"

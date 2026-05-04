@@ -68,11 +68,48 @@ Document titles use the filename and repo name in parentheses:
 Numbered decision sections use periods:
 `## D-001. Purpose of this repository`
 
-Avoid emdashes.
-Avoid endashes.
-Prefer semicolons, commas, or starting a new sentence.
+Avoid emdashes and endashes;
+prefer semicolons, commas, or starting a new sentence.
 Start each sentence on a new line to assist diffs.
 Keep line length to 100 characters wherever possible.
+Do not remove comments or annotations (e.g. WHY:).
+Section comments in Python files use triple-equals:
+
+```python
+# === Section Name ===
+```
+
+## Organization Conventions
+
+Split files when they contain more than one reason to change.
+
+Split production code when:
+
+- A module has more than one public responsibility
+- A class or function group would be imported independently by different consumers
+- File length makes navigation painful (roughly 300+ lines is a signal, not a rule)
+
+Split test files when:
+
+- Tests for different modules are in the same file
+- A fixture factory grows large enough to be a module on its own
+- Test helpers are being imported by multiple test files
+
+## Python File Docstrings
+
+All Python files begin with a docstring using the following format.
+
+WHY: The path on line 1 enables Find in Files to locate the right file
+across directories with identical filenames.
+The description on line 2 states purpose without opening the file.
+The period after the name and this format follow Google docstring style.
+
+```python
+"""path/to/filename.py.
+
+One-line description of module purpose.
+"""
+```
 
 ## Agent Task Assignment
 
