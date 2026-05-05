@@ -4,6 +4,21 @@
 # VARIANT: adaptive-manifest-schema
 # Updated: 2026-05-03
 
+# Fast, consistent repository hygiene before commit.
+#
+# These hooks complement and do not replace:
+# - .editorconfig
+# - .gitattributes
+# - pyproject.toml
+#
+# Local usage:
+#   uv self update
+#   uvx pre-commit install
+#   uvx pre-commit run --all-files
+#
+# Ruff lint runs before Ruff format in pre-commit so autofixes
+# are formatted in the same pass.
+
 exclude: |
   (?x)^(
     \.DS_Store|
@@ -16,64 +31,112 @@ exclude: |
     \.tox/|
     \.venv/|
     .*\.(egg-info)/|
+    .*\.log|
     __pycache__/|
+    _minted.*/|
     build/|
     coverage\.xml|
     dist/|
     htmlcov/|
+    lake-packages/|
     node_modules/|
     site/
   )
 
 repos:
+  # === REPO: PRE-COMMIT HOOKS (cross-platform, zero config) ===
+  #
+  # These hooks prevent problems that show up later as:
+  #   - mysterious diffs
+  #   - broken builds on another OS
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      # === PRE-COMMIT: NORMALIZE FILE FORMATTING ===
+
       - id: trailing-whitespace
         name: A1) Clean trailing whitespace (per .editorconfig)
         args: [--markdown-linebreak-ext=md]
+
       - id: end-of-file-fixer
         name: A2) End files with a newline (per .gitattributes)
+
+      - id: mixed-line-ending
+        name: A3) Normalize line endings to LF before linters
+        args: [--fix=lf] # OBS: Windows working copies may be CRLF.
+
+      #  === PRE-COMMIT: CHECK DATA FILE FORMATS ===
+
       - id: check-json
         name: B1) Validate JSON syntax (except .vscode/)
-        exclude: ^(\.vscode/.*\.json)$
+        # WHY: VSCode settings may include comments, which are non-standard JSON.
+        exclude: ^\.vscode/.*\.json$
+
       - id: check-toml
         name: B2) Validate TOML syntax
+
       - id: check-yaml
         name: B3) Validate YAML syntax
         files: \.(yml|yaml)$
-        exclude: ^(\.vscode/)
+        # WHY:
+        #    VS Code config files are editor-specific
+        #    mkdocs.yml may use YAML anchors not supported by the checker
+        exclude: ^(\.vscode/|mkdocs\.ya?ml$)
+
+      # === PRE-COMMIT:CHECK FOR COMMON PROBLEMS ===
+
       - id: check-added-large-files
         name: C1) Prevent accidental commits of large binaries
-        args: [--maxkb=2000]
+        args: [--maxkb=500]
+
       - id: check-merge-conflict
         name: C2) Prevent committing merge conflicts
+
       - id: check-case-conflict
         name: C3) Check for filename case conflicts
 
+  # === REPO: RUFF PRE-COMMIT (for Python code) ===
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.10
+    rev: v0.15.12
     hooks:
       - id: ruff-check
         name: D1) Ruff linter with autofix (runs first in pre-commit)
+        # WHY: Lint fixes run first so formatter sees the corrected code.
         args: [--fix, --exit-non-zero-on-fix]
+
       - id: ruff-format
         name: D2) Ruff formatter (runs after linter fixes)
+        # WHY: Formats whatever structure the linter left behind.
+
+  # === EXECUTE: LOCAL VALIDATION ===
 
   - repo: local
     hooks:
-      - id: adaptive-manifest-validate
-        name: E1) Validate MANIFEST.toml against adaptive-interfaces schema
+
+      - id: adaptive-manifest-validate-schema
+        name: E1) Validate schema
         language: system
-        entry: uv run adaptive-manifest validate
+        entry: uv run adaptive-manifest validate-schema --strict
+        pass_filenames: false
+        always_run: true
+
+      - id: adaptive-manifest-validate
+        name: E2) Validate MANIFEST.toml against schema
+        language: system
+        entry: uv run adaptive-manifest validate --strict
         pass_filenames: false
         always_run: true
 
       - id: markdownlint
-        name: E2) Markdown lint
+        name: E3) Markdown lint
+        # Uses .markdownlint-cli2.yaml if present, otherwise defaults.
         language: system
         entry: npx markdownlint-cli2 --fix
         pass_filenames: false
         always_run: true
 
-fail_fast: false
+# === GLOBAL SETTINGS ===
+# ALT: Set fail_fast to true to stop at first failure.
+fail_fast: false # Run all hooks even if one fails
