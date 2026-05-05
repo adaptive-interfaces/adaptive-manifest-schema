@@ -18,7 +18,7 @@
 
 [meta]
 schema = "adaptive-interfaces-manifest-schema"
-version = "0.1.0"
+version = "0.3.0"
 status = "active"
 title = "Adaptive Interfaces Manifest Schema"
 manifest_schema_id = "adaptive-interfaces-manifest-schema-1"

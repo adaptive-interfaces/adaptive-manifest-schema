@@ -337,3 +337,35 @@ Two distinct identifier fields serve two distinct purposes:
 - D-003 versioning discussion is superseded by this decision and D-008 combined.
 
 ---
+
+## D-010. Single source of truth for packaged schema access
+
+**Status:** Accepted
+
+**Context:**
+The schema repo has two distinct use cases:
+
+- `adaptive-manifest validate-schema` validates the schema definition itself.
+- `adaptive-manifest validate` validates a repo `MANIFEST.toml` against the schema.
+
+The schema definition must have exactly one committed source of truth:
+the root-level `manifest-schema.toml` established in D-008.
+Downstream repos must not carry their own copy of this file.
+
+However, downstream repos need `adaptive-manifest validate` to work after
+installing the package from PyPI.
+So the published wheel must include a runtime-accessible schema artifact.
+
+**Decision:**
+`manifest-schema.toml` remains the only committed schema source of truth.
+
+The build system packages that single root-level source file into the wheel as:
+
+```text
+adaptive_manifest_schema/manifest-schema.toml
+```
+
+This directly supersedes the misleading consequence in D-008
+that says `load_schema()` uses
+`Path("manifest-schema.toml")`;
+D-010 narrows the final rule without editing D-008.

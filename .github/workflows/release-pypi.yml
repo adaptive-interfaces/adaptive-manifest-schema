@@ -2,11 +2,21 @@
 # .github/workflows/release-pypi.yml
 # (Release PyPI + docs via Zensical)
 # ============================================================
+# VARIANT: adaptive-manifest-schema
+# Updated: 2026-05-05
+#
 # WHY-FILE: Publish a tagged release to PyPI and deploy docs to GitHub Pages.
 # REQ: Trigger ONLY on version tags like v1.2.3.
 # REQ: PyPI project must be configured for Trusted Publishing (OIDC).
 # REQ: uv build must run before anything that modifies the working tree (including uv sync).
 # REQ: Repo Settings -> Pages -> Build and deployment -> Source: GitHub Actions
+# OWNS:
+#   build artifact
+#   artifact version
+#   artifact contains schema
+#   lint/type/package checks
+#   publish
+#   docs
 
 name: Release (PyPI + Zensical docs)
 
@@ -102,6 +112,28 @@ jobs:
             exit 1
           fi
           echo "Artifact version matches tag."
+
+      - name: B5) Confirm wheel contains runtime schema artifact
+        shell: bash
+        run: |
+          set -e
+          python - <<'PY'
+          import pathlib
+          import zipfile
+
+          wheels = list(pathlib.Path("dist").glob("*.whl"))
+          assert wheels, "No wheel found"
+
+          wheel = wheels[-1]
+          names = zipfile.ZipFile(wheel).namelist()
+          matches = [name for name in names if name.endswith("manifest-schema.toml")]
+
+          print(matches)
+
+          assert (
+              "adaptive_manifest_schema/manifest-schema.toml" in names
+          ), "Wheel is missing adaptive_manifest_schema/manifest-schema.toml"
+          PY
 
       # === CHECKS (after build, may modify working tree) ===
 

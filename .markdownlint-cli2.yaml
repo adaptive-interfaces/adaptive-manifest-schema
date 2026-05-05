@@ -50,6 +50,7 @@ config:
 
   MD033:
     allowed_elements:
+      - mark # WHY: Mark elements are often used in Markdown files for highlighting, and this allows them without triggering a lint error.
       - meta # WHY: Metadata is often needed in Markdown files, and this allows it without triggering a lint error.
       - link # WHY: Links are common in Markdown files, and this allows them without triggering a lint error.
       - details # WHY: Details elements are often used in Markdown files, and this allows them without triggering a lint error.

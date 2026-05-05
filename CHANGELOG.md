@@ -13,6 +13,39 @@ and this project adheres to **[Semantic Versioning](https://semver.org/spec/v2.0
 
 ---
 
+## [0.3.0] - 2026-05-05
+
+### Added
+
+- Wheel artifact check to confirm `manifest-schema.toml` is packaged as
+  `adaptive_manifest_schema/manifest-schema.toml`
+- Source/package schema loading split:
+  - `validate-schema` validates the repo-root schema source of truth
+  - `validate` uses the packaged schema for downstream repos
+
+### Changed
+
+- `src/adaptive_manifest_schema/load.py` - schema loading now preserves one committed
+  source of truth while supporting installed-package validation
+- `src/adaptive_manifest_schema/commands/validate_schema.py` - restricted to the
+  repo-root `manifest-schema.toml` source file
+- tests updated to remove current-working-directory assumptions from schema loading
+
+### Fixed
+
+- Downstream repos no longer need a local `manifest-schema.toml` file for
+  `uv run adaptive-manifest validate --strict`
+- Published package validation no longer fails with
+  `ERROR: Schema file not found: manifest-schema.toml`
+
+### Design decisions recorded
+
+- Runtime schema access uses a packaged wheel artifact generated from the single
+  committed root-level `manifest-schema.toml`
+- No second committed schema copy is introduced
+
+---
+
 ## [0.2.0] - 2026-05-04
 
 ### Added
@@ -90,8 +123,9 @@ Follow these steps exactly when creating a new release.
 
 ### Task 1. Update release metadata (manual edits)
 
-1.1. `CITATION.cff` - update `version` and `date-released`
-1.2. `CHANGELOG.md` - add `## [X.Y.Z] - YYYY-MM-DD`, move entries from `[Unreleased]`, update links
+1.1. `manifest-schema.toml` - update `version` when schema semantics or validator contract changes
+1.2. `CITATION.cff` - update `version` and `date-released`
+1.3. `CHANGELOG.md` - add `## [X.Y.Z] - YYYY-MM-DD`, move entries from `[Unreleased]`, update links
 
 ### Task 2. Sync Version and Validate
 
@@ -108,6 +142,10 @@ uvx pre-commit run --all-files
 uv run python -m pyright
 uv run python -m pytest
 uv run python -m zensical build
+
+uv run python -m build
+uv run python -m twine check dist/*
+uv run python -c "import pathlib, zipfile; wheels=list(pathlib.Path('dist').glob('*.whl')); assert wheels, 'No wheel found'; wheel=wheels[-1]; names=zipfile.ZipFile(wheel).namelist(); print([n for n in names if n.endswith('manifest-schema.toml')]); assert 'adaptive_manifest_schema/manifest-schema.toml' in names"
 ```
 
 ### Task 3. Commit, tag, push
@@ -143,7 +181,8 @@ git push origin :refs/tags/vX.Z.Y
 
 ## Links
 
-[Unreleased]: https://github.com/adaptive-interfaces/adaptive-manifest-schema/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/adaptive-interfaces/adaptive-manifest-schema/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/adaptive-interfaces/adaptive-manifest-schema/releases/tag/v0.3.0
 [0.2.0]: https://github.com/adaptive-interfaces/adaptive-manifest-schema/releases/tag/v0.2.0
 [0.1.0]: https://github.com/adaptive-interfaces/adaptive-manifest-schema/releases/tag/v0.1.0
 

@@ -4,9 +4,10 @@ Validate manifest-schema.toml internal consistency.
 This repo only; not meaningful in downstream repos.
 """
 
+import tomllib
 from typing import cast
 
-from adaptive_manifest_schema.load import load_schema
+from adaptive_manifest_schema.load import repo_root_schema_path
 from adaptive_manifest_schema.types.manifest_schema import ManifestSchemaData
 from adaptive_manifest_schema.validate_contract import validate_tag
 from adaptive_manifest_schema.validate_schema import validate_schema_internal
@@ -33,11 +34,12 @@ def run(
     errors: list[str] = []
     warnings: list[str] = []
 
-    try:
-        schema = load_schema()
-    except FileNotFoundError as e:
-        print(f"ERROR: {e}")  # noqa: T201
+    schema_path = repo_root_schema_path()
+    if schema_path is None:
+        print("ERROR: manifest-schema.toml not found in schema repository checkout")  # noqa: T201
         return 1
+
+    schema = tomllib.loads(schema_path.read_text(encoding="utf-8"))
 
     print("[validate-schema] manifest-schema.toml")  # noqa: T201
 

@@ -107,13 +107,25 @@ uvx pre-commit run --all-files
 git add -A
 uvx pre-commit run --all-files
 
+# validate schema source of truth (this repo only)
 uv run adaptive-manifest validate-schema --strict
+
+# validate repo MANIFEST.toml against schema (also used downstream)
 uv run adaptive-manifest validate --strict
 
 # do chores
 uv run python -m pyright
 uv run python -m pytest
 uv run python -m zensical build
+
+# build package artifacts
+uv run python -m build
+
+# validate package metadata
+uv run python -m twine check dist/*
+
+# confirm wheel contains runtime schema artifact
+uv run python -c "import pathlib, zipfile; wheels=list(pathlib.Path('dist').glob('*.whl')); assert wheels, 'No wheel found'; wheel=wheels[-1]; names=zipfile.ZipFile(wheel).namelist(); print([n for n in names if n.endswith('manifest-schema.toml')]); assert 'adaptive_manifest_schema/manifest-schema.toml' in names"
 
 # save progress
 git add -A

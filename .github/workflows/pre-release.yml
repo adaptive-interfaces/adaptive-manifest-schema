@@ -2,10 +2,15 @@
 # .github/workflows/pre-release.yml (Adaptive Manifest Schema)
 # ============================================================
 # VARIANT: adaptive-manifest-schema
-# Updated: 2026-05-03
-
+# Updated: 2026-05-05
+#
 # WHY-FILE: Pre-release checks and build.
 # REQ: Trigger on version tags like v1.2.3.
+#
+# OWNS:
+#   schema validation
+#   MANIFEST.toml validation
+#   artifact integrity checks
 
 name: Pre-Release Checks and Build
 
@@ -94,14 +99,36 @@ jobs:
           fi
           echo "Artifact version matches tag."
 
+      - name: B5) Confirm wheel contains runtime schema artifact
+        shell: bash
+        run: |
+          set -e
+          python - <<'PY'
+          import pathlib
+          import zipfile
+
+          wheels = list(pathlib.Path("dist").glob("*.whl"))
+          assert wheels, "No wheel found"
+
+          wheel = wheels[-1]
+          names = zipfile.ZipFile(wheel).namelist()
+          matches = [name for name in names if name.endswith("manifest-schema.toml")]
+
+          print(matches)
+
+          assert (
+              "adaptive_manifest_schema/manifest-schema.toml" in names
+          ), "Wheel is missing adaptive_manifest_schema/manifest-schema.toml"
+          PY
+
       # ============================================================
       # C) CHECKS REPO-SPECIFIC VALIDATION STEPS (defined in MANIFEST.toml [release])
       # ============================================================
 
       - name: C1) Validate adaptive-interfaces schema
-        run: uv run adaptive-manifest validate-schema
+        run: uv run adaptive-manifest validate-schema --strict
         # WHY: validate this schema
 
       - name: C2) Validate MANIFEST.toml against adaptive-interfaces schema
-        run: uv run adaptive-manifest validate
+        run: uv run adaptive-manifest validate --strict
         # WHY: validate this MANIFEST.toml against the schema

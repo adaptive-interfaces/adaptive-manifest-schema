@@ -1,17 +1,55 @@
 """load.py - Loading and parsing for adaptive-manifest-schema.
 
 Owns:
-  - load_toml()        - read any TOML file
-  - load_schema()      - read schema/manifest-1.toml
-  - load_manifest()    - read MANIFEST.toml
-  - get_git_tag()      - read current exact git tag
+  - load_toml()              - read any TOML file
+  - load_schema()            - read canonical schema
+  - load_manifest()          - read MANIFEST.toml
+  - repo_root_schema_path()  - find schema source of truth
+  - packaged_schema_text()   - read packaged schema artifact
+  - schema_text()            - read schema from source or package
+  - get_git_tag()            - read current exact git tag
 """
 
+from importlib.resources import files
 from pathlib import Path
 import shutil
 import subprocess
 import tomllib
 from typing import Any, cast
+
+SCHEMA_FILENAME = "manifest-schema.toml"
+PACKAGE_NAME = "adaptive_manifest_schema"
+
+
+def repo_root_schema_path(start: Path | None = None) -> Path | None:
+    """Return the repo-root schema path when running from a source checkout."""
+    current = (start or Path.cwd()).resolve()
+
+    for candidate_root in (current, *current.parents):
+        candidate = candidate_root / SCHEMA_FILENAME
+        pyproject = candidate_root / "pyproject.toml"
+        src_package = candidate_root / "src" / PACKAGE_NAME
+
+        if candidate.is_file() and pyproject.is_file() and src_package.is_dir():
+            return candidate
+
+    return None
+
+
+def packaged_schema_text() -> str:
+    """Load the schema embedded in the installed package."""
+    schema = files(PACKAGE_NAME).joinpath(SCHEMA_FILENAME)
+    return schema.read_text(encoding="utf-8")
+
+
+def schema_text() -> str:
+    """Load canonical schema text from source checkout or packaged resource."""
+    root_schema = repo_root_schema_path()
+
+    if root_schema is not None:
+        return root_schema.read_text(encoding="utf-8")
+
+    return packaged_schema_text()
 
 
 def load_toml(path: Path) -> dict[str, Any]:
@@ -20,11 +58,8 @@ def load_toml(path: Path) -> dict[str, Any]:
 
 
 def load_schema() -> dict[str, Any]:
-    """Load manifest-schema.toml from repo root."""
-    path = Path("manifest-schema.toml")
-    if not path.exists():
-        raise FileNotFoundError(f"Schema file not found: {path}")
-    return load_toml(path)
+    """Load manifest-schema.toml from source checkout or packaged resource."""
+    return tomllib.loads(schema_text())
 
 
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
@@ -39,11 +74,11 @@ def get_repo_version(manifest: dict[str, Any]) -> str:
     """Extract and validate repo.version from manifest."""
     repo = manifest.get("repo")
     if not isinstance(repo, dict):
-        raise ValueError("SE_MANIFEST.toml missing or invalid [repo] section")
+        raise ValueError("MANIFEST.toml missing or invalid [repo] section")
     typed: dict[str, object] = cast(dict[str, object], repo)
     version = typed.get("version")
     if not isinstance(version, str):
-        raise ValueError("SE_MANIFEST.toml missing or invalid repo.version")
+        raise ValueError("MANIFEST.toml missing or invalid repo.version")
     return version
 
 
